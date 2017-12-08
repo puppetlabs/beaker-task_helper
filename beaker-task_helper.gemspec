@@ -26,4 +26,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'beaker', '>= 3.0.0'
   spec.add_development_dependency 'beaker-rspec'
   spec.add_development_dependency 'pry'
+
+  spec.add_runtime_dependency 'open3'
 end
