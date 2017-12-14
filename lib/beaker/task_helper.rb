@@ -1,9 +1,7 @@
 require 'beaker'
-require 'beaker/task_helper/defaults'
-require 'beaker/task_helper/bolt_helper'
 
 # Beaker task Helper
-module Beaker::TaskHelper # rubocop:disable Style/ClassAndModuleChildren
+module Beaker::TaskHelper
   include Beaker::DSL
 
   def puppet_version
@@ -61,4 +59,6 @@ module Beaker::TaskHelper # rubocop:disable Style/ClassAndModuleChildren
   end
 end
 
+require 'beaker/task_helper/defaults'
+require 'beaker/task_helper/bolt_helper'
 include Beaker::TaskHelper

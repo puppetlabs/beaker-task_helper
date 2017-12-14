@@ -2,7 +2,7 @@ require 'beaker'
 require 'beaker/task_helper/defaults'
 
 # Beaker task Helper
-module Beaker::TaskHelper::BoltHelper # rubocop:disable Style/ClassAndModuleChildren
+module Beaker::TaskHelper::BoltHelper
   include Beaker::DSL
 
   # Installs bolt on a host or an Array of hsts
