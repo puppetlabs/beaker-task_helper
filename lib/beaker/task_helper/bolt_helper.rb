@@ -21,7 +21,7 @@ module Beaker
       def install_bolt_on(hosts, version = BOLT_VERSION, source = nil)
         Array(hosts).each do |host|
           install_ruby(host)
-          options = if File.file?(source)
+          options = if source && File.file?(source)
                       verify_and_copy_gem(host, source)
                     elsif source
                       "--version #{version} --source #{source}"
@@ -82,7 +82,7 @@ module Beaker
           execute_powershell_script_on(host, command, opts)
         elsif host['platform'] =~ %r{osx}
           env = 'source /etc/profile  ~/.bash_profile ~/.bash_login ~/.profile &&'
-          on(host, env + ' ' + command)
+          on(host, Beaker::Command.new(command, [], prepend_cmds: env))
         else
           on(host, command, opts)
         end
