@@ -57,7 +57,7 @@ module Beaker
       # run_bolt_task(task_name: 'exec', params: {command: 'ls -la'}, format: 'json')
       def run_bolt_task(task_name:, params: nil, password: DEFAULT_PASSWORD, host: 'localhost', format: 'human', module_path: DEFAULT_MODULE_PATH) # rubocop:disable Metrics/LineLength
         raise 'No default host specified' unless defined?(default)
-        bolt_full_cli = "bolt task run #{task_name} --insecure -m #{module_path} --nodes #{host} --password #{password}, --format #{format}" # rubocop:disable Metrics/LineLength
+        bolt_full_cli = "bolt task run #{task_name} --insecure -m #{module_path} --nodes #{host} --password #{password} --format #{format}" # rubocop:disable Metrics/LineLength
         bolt_full_cli << if params.is_a?(Hash)
                            " --params '#{params.to_json}'"
                          else

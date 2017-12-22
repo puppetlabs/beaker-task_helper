@@ -16,9 +16,9 @@ module Beaker
                            end
                          end
 
-      BOLT_VERSION = '0.7.0'.freeze
+      BOLT_VERSION = '0.12.0'.freeze
 
-      DEFAULT_MODULE_PATH = if defined?(defaut)
+      DEFAULT_MODULE_PATH = if defined?(default)
                               if default['platform'] =~ %r{windows}
                                 'C:/ProgramData/PuppetLabs/code/modules'
                               else
