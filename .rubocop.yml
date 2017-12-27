@@ -11,3 +11,9 @@ Metrics/LineLength:
 Style/RegexpLiteral:
   Description: Community preference. See https://github.com/voxpupuli/modulesync_config/issues/168
   EnforcedStyle: percent_r
+Metrics/AbcSize:
+  Enabled: false
+Style/MixinUsage:
+  Enabled: false
+Metrics/ParameterLists:
+  Enabled: false
