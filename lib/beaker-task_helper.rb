@@ -18,7 +18,7 @@ module Beaker::TaskHelper # rubocop:disable Style/ClassAndModuleChildren
                        'root'
                      end
 
-  BOLT_VERSION = '0.16.1'.freeze
+  BOLT_VERSION = '0.21.8'.freeze
 
   def install_bolt_on(hosts, version = BOLT_VERSION, source = nil)
     unless default[:docker_image_commands].nil?
@@ -88,10 +88,9 @@ INSTALL_BOLT_PP
 
   def run_bolt_task(task_name:, params: nil, password: DEFAULT_PASSWORD,
                     host: 'localhost', format: 'human', module_path: nil)
+    module_path ||= default['distmoduledir']
     if fact_on(default, 'osfamily') == 'windows'
       bolt_path = '/cygdrive/c/Program\ Files/Puppet\ Labs/Puppet/sys/ruby/bin/bolt.bat'
-      module_path ||= 'C:/ProgramData/PuppetLabs/code/modules'
-
       if version_is_less('0.15.0', BOLT_VERSION)
         check = '--no-ssl'
       else
@@ -99,8 +98,6 @@ INSTALL_BOLT_PP
       end
     else
       bolt_path = '/opt/puppetlabs/puppet/bin/bolt'
-      module_path ||='/etc/puppetlabs/code/modules'
-
       if version_is_less('0.15.0', BOLT_VERSION)
         check = '--no-host-key-check'
       else
