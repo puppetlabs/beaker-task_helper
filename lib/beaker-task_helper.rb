@@ -35,6 +35,16 @@ module Beaker::TaskHelper # rubocop:disable Style/ClassAndModuleChildren
     end
 
     Array(hosts).each do |host|
+
+      # Work around for BOLT-845
+      pp0 = <<-INSTALL_FFI_PP
+  package { 'ffi' :
+    provider => 'puppet_gem',
+    ensure   => '1.9.18', }
+INSTALL_FFI_PP
+
+      apply_manifest_on(host, pp0) if fact_on(host, 'osfamily') == 'RedHat' && fact_on(host, 'operatingsystemmajrelease') == '5'
+
       pp = <<-INSTALL_BOLT_PP
   package { 'bolt' :
     provider => 'puppet_gem',
