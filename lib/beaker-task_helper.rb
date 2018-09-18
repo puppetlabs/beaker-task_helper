@@ -18,7 +18,12 @@ module Beaker::TaskHelper # rubocop:disable Style/ClassAndModuleChildren
                        'root'
                      end
 
-  BOLT_VERSION = '0.16.1'.freeze
+  BOLT_VERSION = if ENV['BEAKER_PUPPET_COLLECTION'].nil? || ENV['BEAKER_PUPPET_COLLECTION'] == 'pc1'
+                  # puppet4 uses an older version of ruby (2.1.9) that bolt has stopped supporting
+                    '0.16.1'.freeze
+                  else
+                    '0.22.0'.freeze
+                  end
 
   def install_bolt_on(hosts, version = BOLT_VERSION, source = nil)
     unless default[:docker_image_commands].nil?
@@ -89,7 +94,11 @@ INSTALL_BOLT_PP
   def run_bolt_task(task_name:, params: nil, password: DEFAULT_PASSWORD,
                     host: '127.0.0.1', format: 'human', module_path: nil)
     if fact_on(default, 'osfamily') == 'windows'
-      bolt_path = '/cygdrive/c/Program\ Files/Puppet\ Labs/Puppet/sys/ruby/bin/bolt.bat'
+      bolt_path = if ENV['BEAKER_PUPPET_COLLECTION'].nil? || ENV['BEAKER_PUPPET_COLLECTION'] == 'pc1' || ENV['BEAKER_PUPPET_COLLECTION'] == 'puppet5'
+                    '/cygdrive/c/Program\ Files/Puppet\ Labs/Puppet/sys/ruby/bin/bolt.bat'
+                  else
+                    '/cygdrive/c/Program\ Files/Puppet\ Labs/Puppet/puppet/bin/bolt.bat'
+                  end
       module_path ||= 'C:/ProgramData/PuppetLabs/code/modules'
 
       if version_is_less('0.15.0', BOLT_VERSION)
