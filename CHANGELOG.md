@@ -1,4 +1,11 @@
 # Change Log
+## 1.6.0
+### Fixed
+- Updates host from `localhost` to `127.0.0.1`.
+
+### Added
+- `BOLT_VERSION` is now dependent on Puppet version.
+- `bolt_path` is now dependent on Puppet version.
 
 ## 1.5.2
 ### Added
