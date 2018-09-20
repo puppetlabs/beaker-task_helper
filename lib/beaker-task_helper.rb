@@ -22,7 +22,7 @@ module Beaker::TaskHelper # rubocop:disable Style/ClassAndModuleChildren
                   # puppet4 uses an older version of ruby (2.1.9) that bolt has stopped supporting
                     '0.16.1'.freeze
                   else
-                    '0.22.0'.freeze
+                    '0.23.0'.freeze
                   end
 
   def install_bolt_on(hosts, version = BOLT_VERSION, source = nil)
@@ -35,6 +35,16 @@ module Beaker::TaskHelper # rubocop:disable Style/ClassAndModuleChildren
     end
 
     Array(hosts).each do |host|
+
+      # Work around for BOLT-845
+      pp0 = <<-INSTALL_FFI_PP
+  package { 'ffi' :
+    provider => 'puppet_gem',
+    ensure   => '1.9.18', }
+INSTALL_FFI_PP
+
+      apply_manifest_on(host, pp0) if fact_on(host, 'osfamily') == 'RedHat' && fact_on(host, 'operatingsystemmajrelease') == '5'
+
       pp = <<-INSTALL_BOLT_PP
   package { 'bolt' :
     provider => 'puppet_gem',
