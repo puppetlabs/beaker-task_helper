@@ -1,4 +1,9 @@
 # Change Log
+## 1.7.0
+### Added
+- (maint) - Work around for [BOLT-845](https://tickets.puppetlabs.com/browse/BOLT-845), installing ffi on el5 machines).
+- Bump bolt version from `0.22.0` to `0.23.0` to include fix for [BOLT-844](https://tickets.puppetlabs.com/browse/BOLT-844).
+
 ## 1.6.0
 ### Fixed
 - Updates host from `localhost` to `127.0.0.1`.
