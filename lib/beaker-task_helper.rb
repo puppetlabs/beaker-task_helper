@@ -22,7 +22,7 @@ module Beaker::TaskHelper # rubocop:disable Style/ClassAndModuleChildren
                   # puppet4 uses an older version of ruby (2.1.9) that bolt has stopped supporting
                     '0.16.1'.freeze
                   else
-                    '0.22.0'.freeze
+                    '0.23.0'.freeze
                   end
 
   def install_bolt_on(hosts, version = BOLT_VERSION, source = nil)
