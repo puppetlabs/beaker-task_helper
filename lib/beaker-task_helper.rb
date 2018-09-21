@@ -72,15 +72,27 @@ INSTALL_BOLT_PP
   #@param [Host] Task runner
   #@param [Array<Host> Nodes on which to run the task
   #
-  #TODO: Implement on windows
   def setup_ssh_access(task_runner, nodes)
     ssh_dir_path = '/root/.ssh/'
+    win_ssh_path = '/home/Administrator/.ssh/'
+    if task_runner['platform'] =~ /windows/
+      ssh_dir_path = win_ssh_path
+    end
+
     rsa_pub_path = "#{ssh_dir_path}/id_rsa.pub"
 
-    on task_runner, "ssh-keygen -f #{ssh_dir_path}/id_rsa -t rsa -N ''"
+    unless task_runner.file_exist?(rsa_pub_path)
+      on task_runner, "ssh-keygen -f #{ssh_dir_path}/id_rsa -t rsa -N ''"
+    end
     public_key = on(task_runner, "cat #{rsa_pub_path}").stdout
-    create_remote_file(nodes, "#{rsa_pub_path}", public_key)
-    on(nodes, "cat #{rsa_pub_path} >> #{ssh_dir_path}/authorized_keys")
+    nodes.each do |host|
+      rsa_copy_path = '/root/.ssh/'
+      if host['platform'] =~ /windows/
+        rsa_copy_path = "/home/Administrator/.ssh/"
+      end
+      create_remote_file(host, "#{rsa_copy_path}/id_rsa_task_runner.pub", public_key)
+      on(host, "cat #{rsa_copy_path}/id_rsa_task_runner.pub >> #{rsa_copy_path}/authorized_keys")
+    end
   end
 
   def run_task(task_name:, params: nil, password: DEFAULT_PASSWORD, host: nil, format: 'human')
