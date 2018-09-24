@@ -74,13 +74,24 @@ INSTALL_BOLT_PP
   #
   #TODO: Implement on windows
   def setup_ssh_access(task_runner, nodes)
-    ssh_dir_path = '/root/.ssh/'
-    rsa_pub_path = "#{ssh_dir_path}/id_rsa.pub"
+    task_runner_ssh_dir = '/root/.ssh'
+    task_runner_rsa_pub = "#{task_runner_ssh_dir}/id_rsa.pub"
+    on task_runner, "ssh-keygen -f #{task_runner_ssh_dir}/id_rsa -t rsa -N ''"
+    public_key = on(task_runner, "cat #{task_runner_rsa_pub}").stdout
 
-    on task_runner, "ssh-keygen -f #{ssh_dir_path}/id_rsa -t rsa -N ''"
-    public_key = on(task_runner, "cat #{rsa_pub_path}").stdout
-    create_remote_file(nodes, "#{rsa_pub_path}", public_key)
-    on(nodes, "cat #{rsa_pub_path} >> #{ssh_dir_path}/authorized_keys")
+    nodes.each do |node|
+        case node.platform
+        when /solaris-10/
+            ssh_dir_path = '/.ssh/'
+        when /osx-1012/
+            ssh_dir_path = '/var/root/.ssh/'
+        else
+            ssh_dir_path = '/root/.ssh'
+        end
+        rsa_pub_path = "#{ssh_dir_path}/id_rsa.pub"
+        create_remote_file(node, "#{rsa_pub_path}", public_key)
+        on(node, "cat #{rsa_pub_path} >> #{ssh_dir_path}/authorized_keys")
+    end
   end
 
   def run_task(task_name:, params: nil, password: DEFAULT_PASSWORD, host: nil, format: 'human')
