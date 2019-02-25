@@ -83,7 +83,7 @@ INSTALL_BOLT_PP
         case node.platform
         when /solaris-10/
             ssh_dir_path = '/.ssh/'
-        when /osx-10\.1(2|3)/
+        when /osx-10\.1(2|3|4)/
             ssh_dir_path = '/var/root/.ssh/'
         else
             ssh_dir_path = '/root/.ssh'
