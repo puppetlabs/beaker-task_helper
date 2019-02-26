@@ -115,7 +115,7 @@ INSTALL_BOLT_PP
   def run_bolt_task(task_name:, params: nil, password: DEFAULT_PASSWORD,
                     host: '127.0.0.1', format: 'human', module_path: nil)
     if fact_on(default, 'osfamily') == 'windows'
-      bolt_path = if ENV['BEAKER_PUPPET_COLLECTION'].nil? || ENV['BEAKER_PUPPET_COLLECTION'] == 'pc1' || ENV['BEAKER_PUPPET_COLLECTION'] == 'puppet5'
+      bolt_path = if ENV['BEAKER_PUPPET_COLLECTION'].nil? || ENV['BEAKER_PUPPET_COLLECTION'] == 'pc1' || ENV['BEAKER_PUPPET_COLLECTION'] == 'puppet5' || ENV['BEAKER_PUPPET_COLLECTION'] == 'puppet6'
                     '/cygdrive/c/Program\ Files/Puppet\ Labs/Puppet/sys/ruby/bin/bolt.bat'
                   else
                     '/cygdrive/c/Program\ Files/Puppet\ Labs/Puppet/puppet/bin/bolt.bat'
