@@ -65,6 +65,8 @@ INSTALL_BOLT_PP
   end
 
   def run_puppet_access_login(user:, password: '~!@#$%^*-/ aZ', lifetime: '5y')
+    peconf_password = get_unwrapped_pe_conf_value("console_admin_password")
+    password = peconf_password if peconf_password != nil && peconf_password != ""
     on(master, puppet('access', 'login', '--username', user, '--lifetime', lifetime), stdin: password)
   end
 
