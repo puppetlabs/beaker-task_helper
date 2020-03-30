@@ -3,6 +3,14 @@ require 'beaker'
 module Beaker
   module TaskHelper
     module Inventory
+      def target_key
+        if version_is_less('1.18.0', BOLT_VERSION)
+          'targets'
+        else
+          'nodes'
+        end
+      end
+
       # This attempts to make a bolt inventory hash from beakers hosts
       # roles should be targetable by bolt as groups
       def hosts_to_inventory
@@ -12,10 +20,10 @@ module Beaker
           if group_name =~ %r{\A[a-z0-9_]+\Z}
             group = groups.find { |g| g['name'] == group_name }
             unless group
-              group = { 'name' => group_name, 'nodes' => [] }
+              group = { 'name' => group_name, target_key => [] }
               groups << group
             end
-            group['nodes'] << node
+            group[target_key] << node
           else
             puts "invalid group name #{group_name} skipping"
           end
@@ -66,7 +74,7 @@ module Beaker
           }
         end
 
-        { 'nodes' => nodes,
+        { target_key => nodes,
           'groups' => groups,
           'config' => {
             'ssh' => {
