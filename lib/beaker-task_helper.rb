@@ -64,6 +64,14 @@ INSTALL_BOLT_PP
     ENV['PUPPET_INSTALL_TYPE'] =~ %r{pe}i
   end
 
+  def target_flag
+    if version_is_less('1.18.0', BOLT_VERSION)
+      '--targets'
+    else
+      '--nodes'
+    end
+  end
+
   def run_puppet_access_login(user:, password: '~!@#$%^*-/ aZ', lifetime: '5y')
     peconf_password = get_unwrapped_pe_conf_value("console_admin_password")
     password = peconf_password if peconf_password != nil && peconf_password != ""
@@ -141,7 +149,7 @@ INSTALL_BOLT_PP
     end
 
     bolt_full_cli = "#{bolt_path} task run #{task_name} #{check} -m #{module_path} " \
-                    "--nodes #{host} --password #{password}"
+                    "#{target_flag} #{host} --password #{password}"
     bolt_full_cli << " --format #{format}" if format != 'human'
     bolt_full_cli << if params.class == Hash
                        " --params '#{params.to_json}'"
@@ -157,7 +165,7 @@ INSTALL_BOLT_PP
   end
 
   def run_puppet_task(task_name:, params: nil, host: '127.0.0.1', format: 'human')
-    args = ['task', 'run', task_name, '--nodes', host]
+    args = ['task', 'run', task_name, target_flag, host]
     if params.class == Hash
       args << '--params'
       args << params.to_json
@@ -178,7 +186,7 @@ INSTALL_BOLT_PP
   end
 
   def task_summary_line(total_hosts: 1, success_hosts: 1)
-    "Job completed. #{success_hosts}/#{total_hosts} nodes succeeded|Ran on #{total_hosts} node"
+    "Job completed. #{success_hosts}/#{total_hosts} targets succeeded|Ran on #{total_hosts} target"
   end
 end
 
