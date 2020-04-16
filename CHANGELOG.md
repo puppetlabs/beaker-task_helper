@@ -1,4 +1,15 @@
 # Change Log
+### 1.8.0
+### Changed
+- Updated the helper to be compatible with [Bolt 2.0 changes](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md). *Bolt 2.0 introduced some [backwards-incompatible changes](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md#bolt-200-2020-02-19) that you should be aware of before upgrading to this version.*
+
+### 1.7.1-4
+### Fixed
+- `.ssh` directory path on OSX 10.12/10.13/10.14 and Solaris 10
+- Puppet 6 collection handling fix
+- PE `puppet access login` fixes
+
+
 ## 1.7.0
 ### Added
 - (maint) - Work around for [BOLT-845](https://tickets.puppetlabs.com/browse/BOLT-845), installing ffi on el5 machines).
