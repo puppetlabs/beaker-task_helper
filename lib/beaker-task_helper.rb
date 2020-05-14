@@ -8,6 +8,35 @@ module Beaker::TaskHelper # rubocop:disable Style/ClassAndModuleChildren
     (on default, puppet('--version')).output.chomp
   end
 
+  def bolt_path
+    if fact_on(default, 'osfamily') == 'windows'
+      if ENV['BEAKER_PUPPET_COLLECTION'].nil? || %w[pc1 puppet5 puppet6].include?(ENV['BEAKER_PUPPET_COLLECTION'])
+        '/cygdrive/c/Program\ Files/Puppet\ Labs/Puppet/sys/ruby/bin/bolt.bat'
+      else
+        '/cygdrive/c/Program\ Files/Puppet\ Labs/Puppet/puppet/bin/bolt.bat'
+      end
+    else
+      # If bolt was installed as a package
+      if File.exist?('/opt/puppetlabs/puppet/bin/bolt')
+        '/opt/puppetlabs/puppet/bin/bolt'
+      else
+      # Or as a gem
+        'bolt'
+      end
+    end
+  end
+
+  def self.bolt_version(beakerhost = nil)
+    beakerhost ||= default
+    begin
+      on(beakerhost, "#{bolt_path} --version")
+    rescue Beaker::Host::CommandFailure
+      # If bolt isn't installed, use the latest version
+      #on(beakerhost, "gem query --name-matches ^bolt$ -r -q").scan(/\d+/).join('.')
+      '2.10.0'
+    end
+  end
+
   DEFAULT_PASSWORD = if ENV.has_key?('BEAKER_password')
                        ENV['BEAKER_password']
                      elsif !defined?(default)
@@ -18,14 +47,15 @@ module Beaker::TaskHelper # rubocop:disable Style/ClassAndModuleChildren
                        'root'
                      end
 
-  BOLT_VERSION = if ENV['BEAKER_PUPPET_COLLECTION'].nil? || ENV['BEAKER_PUPPET_COLLECTION'] == 'pc1'
-                  # puppet4 uses an older version of ruby (2.1.9) that bolt has stopped supporting
-                    '0.16.1'.freeze
-                  else
-                    '0.23.0'.freeze
-                  end
+  DEFAULT_BOLT_VERSION = if ENV['BEAKER_PUPPET_COLLECTION'].nil? || ENV['BEAKER_PUPPET_COLLECTION'] == 'pc1'
+                           # puppet4 uses an older version of ruby (2.1.9) that bolt has stopped supporting
+                           '0.16.1'.freeze
+                         else
+                           # CODEREVIEW: Can we update this to 1.x?
+                           '0.23.0'.freeze
+                         end
 
-  def install_bolt_on(hosts, version = BOLT_VERSION, source = nil)
+  def install_bolt_on(hosts, version = DEFAULT_BOLT_VERSION, source = nil)
     unless default[:docker_image_commands].nil?
       if default[:docker_image_commands].to_s.include? 'yum'
         on(hosts, 'yum install -y make gcc ruby-devel', acceptable_exit_codes: [0, 1]).stdout
@@ -64,8 +94,8 @@ INSTALL_BOLT_PP
     ENV['PUPPET_INSTALL_TYPE'] =~ %r{pe}i
   end
 
-  def target_flag
-    if version_is_less('1.18.0', BOLT_VERSION)
+  def target_flag(host=default)
+    if version_is_less('1.18.0', self.bolt_version(host))
       '--targets'
     else
       '--nodes'
@@ -125,23 +155,17 @@ INSTALL_BOLT_PP
   def run_bolt_task(task_name:, params: nil, password: DEFAULT_PASSWORD,
                     host: '127.0.0.1', format: 'human', module_path: nil)
     if fact_on(default, 'osfamily') == 'windows'
-      bolt_path = if ENV['BEAKER_PUPPET_COLLECTION'].nil? || ENV['BEAKER_PUPPET_COLLECTION'] == 'pc1' || ENV['BEAKER_PUPPET_COLLECTION'] == 'puppet5' || ENV['BEAKER_PUPPET_COLLECTION'] == 'puppet6'
-                    '/cygdrive/c/Program\ Files/Puppet\ Labs/Puppet/sys/ruby/bin/bolt.bat'
-                  else
-                    '/cygdrive/c/Program\ Files/Puppet\ Labs/Puppet/puppet/bin/bolt.bat'
-                  end
       module_path ||= 'C:/ProgramData/PuppetLabs/code/modules'
 
-      if version_is_less('0.15.0', BOLT_VERSION)
+      if version_is_less('0.15.0', self.bolt_version)
         check = '--no-ssl'
       else
         check = '--insecure'
       end
     else
-      bolt_path = '/opt/puppetlabs/puppet/bin/bolt'
       module_path ||='/etc/puppetlabs/code/modules'
 
-      if version_is_less('0.15.0', BOLT_VERSION)
+      if version_is_less('0.15.0', self.bolt_version)
         check = '--no-host-key-check'
       else
         check = '--insecure'
@@ -165,7 +189,7 @@ INSTALL_BOLT_PP
   end
 
   def run_puppet_task(task_name:, params: nil, host: '127.0.0.1', format: 'human')
-    args = ['task', 'run', task_name, target_flag, host]
+    args = ['task', 'run', task_name, target_flag(master), host]
     if params.class == Hash
       args << '--params'
       args << params.to_json

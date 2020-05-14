@@ -1,14 +1,23 @@
 require 'beaker'
+require 'beaker-task_helper'
 
 module Beaker
   module TaskHelper
     module Inventory
-      def target_key
-        if version_is_less('1.18.0', BOLT_VERSION)
-          'targets'
+      def inventory_version
+        if version_is_less('1.18.0', Beaker::TaskHelper.bolt_version)
+          2
         else
-          'nodes'
+          1
         end
+      end
+
+      def target_key
+        inventory_version == 2 ? 'targets' : 'nodes'
+      end
+      
+      def uri_key
+        inventory_version == 2 ? 'uri' : 'name'
       end
 
       # This attempts to make a bolt inventory hash from beakers hosts
@@ -69,18 +78,20 @@ module Beaker
           end
 
           {
-            'name' => node_name,
+            uri_key => node_name,
             'config' => config
           }
         end
 
-        { target_key => nodes,
-          'groups' => groups,
-          'config' => {
-            'ssh' => {
-              'host-key-check' => false
-            }
-          } }
+        inv = { target_key => nodes,
+                'groups' => groups,
+                'config' => {
+                  'ssh' => {
+                    'host-key-check' => false
+                  }
+                } }
+        inv.merge!({'version' => 2}) if inventory_version == 2
+        inv
       end
     end
   end
