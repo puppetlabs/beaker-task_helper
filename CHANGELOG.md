@@ -1,4 +1,12 @@
 # Change Log
+
+### 1.9.0
+### Added
+- Added `BEAKER_BOLT_VERSION` environment variable to set the version of Bolt used to generate an inventory file.
+
+### Changed
+- Updated the helper to query the version of Bolt installed on the Beaker host when generating an inventory file.
+
 ### 1.8.0
 ### Changed
 - Updated the helper to be compatible with [Bolt 2.0 changes](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md). *Bolt 2.0 introduced some [backwards-incompatible changes](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md#bolt-200-2020-02-19) that you should be aware of before upgrading to this version.*
@@ -8,7 +16,6 @@
 - `.ssh` directory path on OSX 10.12/10.13/10.14 and Solaris 10
 - Puppet 6 collection handling fix
 - PE `puppet access login` fixes
-
 
 ## 1.7.0
 ### Added

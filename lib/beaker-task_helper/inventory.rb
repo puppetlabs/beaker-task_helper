@@ -50,8 +50,11 @@ module Beaker
           else
             config = { 'transport' => 'ssh',
                        'ssh' => { 'host-key-check' => false } }
-            %i[password user port].each do |k|
+            %i[password user].each do |k|
               config['ssh'][k.to_s] = host[:ssh][k] if host[:ssh][k]
+            end
+            if host[:ssh][:port]
+              config['ssh']['port'] = host[:ssh][:port].to_i
             end
 
             case host[:hypervisor]

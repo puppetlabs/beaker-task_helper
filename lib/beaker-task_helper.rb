@@ -26,14 +26,19 @@ module Beaker::TaskHelper # rubocop:disable Style/ClassAndModuleChildren
     end
   end
 
+  # Returns the version of Bolt installed on the beakerhost. Used to determine
+  # which inventory file version to generate.
+  #
   def self.bolt_version(beakerhost = nil)
+    return ENV['BEAKER_BOLT_VERSION'] if ENV['BEAKER_BOLT_VERSION']
+
     beakerhost ||= default
     begin
       on(beakerhost, "#{bolt_path} --version")
     rescue Beaker::Host::CommandFailure
-      # If bolt isn't installed, use the latest version
-      #on(beakerhost, "gem query --name-matches ^bolt$ -r -q").scan(/\d+/).join('.')
-      '2.10.0'
+      # If bolt isn't installed, default to 1.18.0 which is the latest version
+      # to support only v1 inventory
+      '1.18.0'
     end
   end
 
