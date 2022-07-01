@@ -58,7 +58,7 @@ module Beaker
             end
 
             case host[:hypervisor]
-            when 'docker'
+            when 'docker', 'none'
               nil
             when 'vagrant'
               key = nil
