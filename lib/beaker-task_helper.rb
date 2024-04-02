@@ -9,7 +9,7 @@ module Beaker::TaskHelper # rubocop:disable Style/ClassAndModuleChildren
   end
 
   def bolt_path
-    if fact_on(default, 'osfamily') == 'windows'
+    if fact_on(default, 'os.family') == 'windows'
       if ENV['BEAKER_PUPPET_COLLECTION'].nil? || %w[pc1 puppet5 puppet6].include?(ENV['BEAKER_PUPPET_COLLECTION'])
         '/cygdrive/c/Program\ Files/Puppet\ Labs/Puppet/sys/ruby/bin/bolt.bat'
       else
@@ -78,7 +78,7 @@ module Beaker::TaskHelper # rubocop:disable Style/ClassAndModuleChildren
     ensure   => '1.9.18', }
 INSTALL_FFI_PP
 
-      apply_manifest_on(host, pp0) if fact_on(host, 'osfamily') == 'RedHat' && fact_on(host, 'operatingsystemmajrelease') == '5'
+      apply_manifest_on(host, pp0) if fact_on(host, 'os.family') == 'RedHat' && fact_on(host, 'os.release.major') == '5'
 
       pp = <<-INSTALL_BOLT_PP
   package { 'bolt' :
@@ -159,7 +159,7 @@ INSTALL_BOLT_PP
 
   def run_bolt_task(task_name:, params: nil, password: DEFAULT_PASSWORD,
                     host: '127.0.0.1', format: 'human', module_path: nil)
-    if fact_on(default, 'osfamily') == 'windows'
+    if fact_on(default, 'os.family') == 'windows'
       module_path ||= 'C:/ProgramData/PuppetLabs/code/modules'
 
       if version_is_less('0.15.0', self.bolt_version)
@@ -186,7 +186,7 @@ INSTALL_BOLT_PP
                        " #{params}"
                      end
     # windows is special
-    if fact_on(default, 'osfamily') == 'windows'
+    if fact_on(default, 'os.family') == 'windows'
       bolt_full_cli << ' --transport winrm --user Administrator'
     end
     puts "BOLT_CLI: #{bolt_full_cli}" if ENV['BEAKER_debug']
